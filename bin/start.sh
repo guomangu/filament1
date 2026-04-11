@@ -120,7 +120,7 @@ fi
 
 cd "$SRC_DIR"
 # Use setcap or sudo for port 80 if necessary, but here we just try
-"$BIN_DIR/frankenphp" php-server --root "$SRC_DIR/public" >> "$LOG_DIR/frankenphp.log" 2>&1 &
+"$BIN_DIR/frankenphp" php-server --domain guuu.localhost --root "$SRC_DIR/public" >> "$LOG_DIR/frankenphp.log" 2>&1 &
 FRANKEN_PID=$!
 
 # Trap for clean shutdown

@@ -207,8 +207,19 @@ cat <<EOF > "$BIN_DIR/php"
 export LD_LIBRARY_PATH="$BASE_DIR/bin/lib:\$LD_LIBRARY_PATH"
 # Strip common flags that frankenphp php-cli doesn't handle natively
 ARGS=()
+SKIP_NEXT=0
 for arg in "\$@"; do
-    if [[ "\$arg" == "-d" ]] || [[ "\$arg" == "allow_url_fopen=1" ]]; then continue; fi
+    if [ "\$SKIP_NEXT" -eq 1 ]; then
+        SKIP_NEXT=0
+        continue
+    fi
+    if [[ "\$arg" == "-d" ]]; then
+        SKIP_NEXT=1
+        continue
+    fi
+    if [[ "\$arg" == -d* ]]; then
+        continue
+    fi
     ARGS+=("\$arg")
 done
 exec "$BASE_DIR/bin/frankenphp" php-cli "\${ARGS[@]}"
@@ -228,6 +239,7 @@ cat <<EOF > "$BIN_DIR/composer"
 #!/bin/bash
 PROJECT_ROOT="$BASE_DIR"
 export LD_LIBRARY_PATH="\$PROJECT_ROOT/bin/lib:\$LD_LIBRARY_PATH"
+export PHP_BINARY="\$PROJECT_ROOT/bin/php"
 # Call frankenphp directly to avoid double-processing in php wrapper
 exec "\$PROJECT_ROOT/bin/frankenphp" php-cli "\$PROJECT_ROOT/bin/composer.phar" "\$@"
 EOF
@@ -265,6 +277,7 @@ ln -sf "$BIN_DIR/node/bin/node" "$BIN_DIR/.core/node"
 ln -sf "$BIN_DIR/node/bin/npm" "$BIN_DIR/.core/npm"
 export PATH="$BIN_DIR/.core:$PATH"
 export PHP="$BIN_DIR/php"
+export PHP_BINARY="$BIN_DIR/php"
 
 # PHP Dependencies
 "$BIN_DIR/composer" install --no-interaction --prefer-dist

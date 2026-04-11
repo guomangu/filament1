@@ -105,13 +105,14 @@ id="{{ $id }}">
         Localisation du Cercle (Ville/Région/Pays) <span class="text-red-500">*</span>
     </label>
 
-    <div class="relative">
+    <div class="relative" :class="isOpen ? 'z-[100]' : 'z-10'">
         <div class="addr-input-wrp flex rounded-xl shadow-sm ring-1 transition duration-75 focus-within:ring-2 ring-gray-950/20 dark:ring-white/20 focus-within:ring-blue-600 dark:focus-within:ring-blue-500 overflow-hidden border border-gray-200 dark:border-white/10">
             <div class="min-w-0 flex-1">
                 <input 
                     x-model="query" 
                     @input.debounce.400ms="fetchSuggestions(); isAutoDetected = false;"
                     @click.away="isOpen = false"
+                    @focus="if(query.length >= 3) fetchSuggestions()"
                     type="text" 
                     autocomplete="off"
                     class="addr-input-field block w-full py-3.5 px-4 text-base focus:outline-none focus:ring-0 sm:text-sm sm:leading-6" 
@@ -128,7 +129,7 @@ id="{{ $id }}">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                     </svg>
-                    <div x-show="loading" class="w-4 h-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
+                    <div x-show="loading" style="display: none;" class="w-4 h-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
                 </button>
             </div>
         </div>
@@ -138,30 +139,31 @@ id="{{ $id }}">
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 translate-y-2"
             x-transition:enter-end="opacity-100 translate-y-0"
-            class="addr-dropdown absolute z-60 w-full mt-2 border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden divide-y divide-gray-100 dark:divide-white/5">
+            style="z-index: 100;"
+            class="addr-dropdown absolute z-[100] w-full mt-2 border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden divide-y divide-gray-100 dark:divide-white/5">
             <template x-for="suggestion in suggestions" :key="suggestion.place_id">
-                <button @click="select(suggestion)" type="button" class="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-all group">
-                    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+                <button @click="select(suggestion)" type="button" class="w-full text-left px-3 sm:px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-all group focus:bg-blue-50 outline-none">
+                    <div class="flex flex-wrap items-center gap-1 sm:gap-2 py-1">
                         <!-- Ville -->
-                        <div class="flex flex-col items-center shrink-0 bg-blue-600/10 border border-blue-200/50 px-3 py-1 rounded-xl">
+                        <div class="flex flex-col items-center shrink-0 w-auto bg-blue-600/10 border border-blue-200/50 px-2 sm:px-3 py-1 rounded-xl">
                             <span class="text-[7px] font-black uppercase tracking-widest text-blue-600 leading-none mb-0.5">Ville</span>
-                            <span class="text-[9px] font-bold text-blue-900 group-hover:text-blue-600 transition-colors" x-text="suggestion.parsed.city"></span>
+                            <span class="text-[8px] sm:text-[9px] font-bold text-blue-900 group-hover:text-blue-600 transition-colors" x-text="suggestion.parsed.city"></span>
                         </div>
                         <div class="text-slate-300 shrink-0">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+                            <svg class="w-2 h-2 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
                         </div>
                         <!-- Région -->
-                        <div class="flex flex-col items-center shrink-0 bg-orange-600/10 border border-orange-200/50 px-3 py-1 rounded-xl">
+                        <div class="flex flex-col items-center shrink-0 bg-orange-600/10 border border-orange-200/50 px-2 sm:px-3 py-1 rounded-xl">
                             <span class="text-[7px] font-black uppercase tracking-widest text-orange-500 leading-none mb-0.5">Région</span>
-                            <span class="text-[9px] font-bold text-orange-900" x-text="suggestion.parsed.region"></span>
+                            <span class="text-[8px] sm:text-[9px] font-bold text-orange-900" x-text="suggestion.parsed.region"></span>
                         </div>
                         <div class="text-slate-300 shrink-0">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+                            <svg class="w-2 h-2 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
                         </div>
                         <!-- Pays -->
-                        <div class="flex flex-col items-center shrink-0 bg-slate-900/10 border border-slate-900/20 px-3 py-1 rounded-xl">
+                        <div class="flex flex-col items-center shrink-0 bg-slate-900/10 border border-slate-900/20 px-2 sm:px-3 py-1 rounded-xl">
                             <span class="text-[7px] font-black uppercase tracking-widest text-slate-500 leading-none mb-0.5">Pays</span>
-                            <span class="text-[9px] font-bold text-slate-900 uppercase" x-text="suggestion.parsed.country"></span>
+                            <span class="text-[8px] sm:text-[9px] font-bold text-slate-900 uppercase" x-text="suggestion.parsed.country"></span>
                         </div>
                     </div>
                 </button>

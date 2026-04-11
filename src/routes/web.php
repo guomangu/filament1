@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
 
+Route::get('/login', function () {
+    return redirect()->route('filament.admin.auth.login');
+})->name('login');
+
 Route::middleware('auth')->group(function () {
     Route::get('/circles/create', CircleCreate::class)->name('circles.create');
     Route::get('/circles/{circle}/edit', CircleEdit::class)->name('circles.edit');
