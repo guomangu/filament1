@@ -81,13 +81,13 @@
                 <div class="flex justify-between h-24">
                     <!-- Left: Logo & Messaging Trigger -->
                     <div class="flex items-center flex-shrink-0 gap-4">
-                        <a href="/" class="flex items-center group">
+                        <a href="{{ route('search') }}" class="flex items-center group">
                             <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/20 group-hover:rotate-12 transition-all duration-500">
                                 <svg class="w-6 h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                             </div>
                         </a>
                         
-                        <button @click="Livewire.dispatch('toggleMessaging')" 
+                        <button @auth @click="Livewire.dispatch('toggleMessaging')" @else @click="window.location.href='/admin/register'" @endauth 
                                 x-data="{ unreadCount: {{ auth()->check() ? auth()->user()->receivedMessages()->whereNull('read_at')->count() : 0 }} }"
                                 x-on:unread-count-updated.window="unreadCount = $event.detail.count"
                                 class="flex items-center gap-3 px-4 py-2 md:py-3 bg-slate-900/5 hover:bg-blue-600 hover:text-white rounded-xl md:rounded-2xl transition-all group border border-slate-100/50 shadow-sm hover:shadow-blue-500/20 hover:-translate-y-0.5 active:translate-y-0 relative">

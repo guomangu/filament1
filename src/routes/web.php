@@ -9,7 +9,9 @@ use App\Livewire\User\Edit as UserEdit;
 use App\Livewire\Home;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', Home::class)->name('home');
+Route::get('/search', Home::class)->name('search');
+
+Route::get('/', \App\Livewire\User\Profile::class)->defaults('user', '1')->name('home');
 
 Route::get('/login', function () {
     return redirect()->route('filament.admin.auth.login');
