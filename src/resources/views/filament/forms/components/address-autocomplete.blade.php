@@ -53,7 +53,18 @@
             try {
                 const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json&addressdetails=1`);
                 const data = await response.json();
-                this.select(data, true);
+                const addr = data.address || {};
+                const city = addr.city || addr.town || addr.village || addr.municipality;
+                const region = addr.state || addr.region || addr.province;
+                const country = addr.country;
+                
+                if (city && region && country) {
+                    this.suggestions = [{ ...data, parsed: { city, region, country } }];
+                    this.isOpen = true;
+                    if (!this.query) this.query = city;
+                } else {
+                    this.select(data, true);
+                }
             } catch (e) {
                 console.error(e);
             } finally {
