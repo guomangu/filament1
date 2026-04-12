@@ -5,6 +5,13 @@
 # ==============================================================================
 set -e
 
+if [ "$(id -u)" = "0" ]; then
+    echo -e "\033[0;31mERREUR: Ne lancez PAS ce script avec 'sudo' !\033[0m"
+    echo -e "\033[1;33mCela corrompt les droits de votre base de données et de vos fichiers. Relancez-le simplement: ./bin/install.sh\033[0m"
+    echo -e "Si des paquets système doivent être installés, le script vous demandera votre mot de passe temporairement au moment opportun."
+    exit 1
+fi
+
 # Configuration
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BIN_DIR="$PROJECT_ROOT/bin"
@@ -86,7 +93,9 @@ fi
 # Composer
 if [ ! -f "$BIN_DIR/composer.phar" ]; then
     echo "Installing Composer..."
-    curl -sS https://getcomposer.org/installer | "$BIN_DIR/frankenphp" php-cli -- --install-dir="$BIN_DIR" --filename=composer.phar
+    curl -sS https://getcomposer.org/installer -o "$BIN_DIR/composer-setup.php"
+    "$BIN_DIR/frankenphp" php-cli "$BIN_DIR/composer-setup.php" --install-dir="$BIN_DIR" --filename=composer.phar
+    rm -f "$BIN_DIR/composer-setup.php"
     chmod +x "$BIN_DIR/composer.phar"
 fi
 
