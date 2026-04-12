@@ -73,11 +73,12 @@ if ! grep -q "^DB_HOST=localhost" .env; then
     "$BIN_DIR/php" "$SRC_DIR/artisan" config:clear
 fi
 
-# If running as root (sudo), we must override DB_USERNAME to match the process owner
-# for unix_socket authentication to work correctly.
-if [ "$(id -u)" = "0" ]; then
-    echo -e "${YELLOW}Running as root, overriding DB_USERNAME to 'root' for socket auth...${NC}"
-    export DB_USERNAME=root
+# Auto-heal DB_USERNAME for socket authentication
+CURRENT_USER=$(whoami)
+if ! grep -q "^DB_USERNAME=$CURRENT_USER" .env; then
+    echo -e "${YELLOW}Enforcing DB_USERNAME=$CURRENT_USER for socket connection...${NC}"
+    sed -i "s|^DB_USERNAME=.*|DB_USERNAME=$CURRENT_USER|" .env
+    "$BIN_DIR/php" "$SRC_DIR/artisan" config:clear
 fi
 
 if [ ! -S "$MYSQL_SOCKET" ]; then
