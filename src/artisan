@@ -5,6 +5,9 @@ use Symfony\Component\Console\Input\ArgvInput;
 
 define('LARAVEL_START', microtime(true));
 
+// Prevent PHP 8.5 deprecation warnings (e.g., PDO::MYSQL_ATTR_SSL_CA) from breaking artisan commands
+error_reporting(E_ALL & ~E_DEPRECATED);
+
 // Register the Composer autoloader...
 require __DIR__.'/vendor/autoload.php';
 
