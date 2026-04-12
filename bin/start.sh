@@ -102,6 +102,14 @@ if ! export LD_LIBRARY_PATH="$BIN_DIR/lib" && "$MARIADB_DIR/bin/mariadb" --socke
 fi
 
 # Start FrankenPHP
+if [ "$(id -u)" = "0" ]; then
+    echo -e "${RED}ERREUR: Ne lancez PLUS ce script avec 'sudo' !${NC}"
+    echo -e "${YELLOW}Cela a pour effet de corrompre les droits (les images téléchargées sont créées sous 'root').${NC}"
+    echo -e "Pour régler vos fichiers déjà corrompus, tapez : ${GREEN}sudo chown -R \$SUDO_USER:\$SUDO_USER data/ src/storage/ src/bootstrap/cache/ bin/${NC}"
+    echo -e "Puis relancez normalement : ${GREEN}./bin/start.sh${NC}"
+    exit 1
+fi
+
 PORT=${1:-80}
 echo -e "${GREEN}Starting FrankenPHP on port $PORT...${NC}"
 
@@ -112,9 +120,10 @@ if [ "$PORT" = "80" ]; then
         sudo systemctl stop frankenphp || echo -e "${RED}Warning: Could not stop system frankenphp. Port conflict likely.${NC}"
     fi
     
-    # Check if we can bind to port 80 (need root or setcap)
-    if [ "$(id -u)" != "0" ]; then
-        echo -e "${YELLOW}Note: Binding to port 80 usually requires root. If this fails, try: sudo ./bin/start.sh${NC}"
+    # Auto-grant cap_net_bind_service so non-root users can bind to port 80 natively
+    if ! /usr/sbin/getcap "$BIN_DIR/frankenphp" 2>/dev/null | grep -q 'cap_net_bind_service'; then
+        echo -e "${YELLOW}Initialisation des permissions (setcap) pour utiliser le port 80 sans sudo...${NC}"
+        sudo /usr/sbin/setcap 'cap_net_bind_service=+ep' "$BIN_DIR/frankenphp"
     fi
 fi
 

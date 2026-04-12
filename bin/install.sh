@@ -395,6 +395,7 @@ fi
 chmod -R 775 storage bootstrap/cache "$DATA_DIR"
 # Use frankenphp directly to avoid any wrapper issues with argument passing
 "$BIN_DIR/frankenphp" php-cli "$SRC_DIR/artisan" config:clear
+"$BIN_DIR/frankenphp" php-cli "$SRC_DIR/artisan" storage:link --force
 
 echo -e "${GREEN}====================================================${NC}"
 echo -e "${GREEN}   Installation Complete! Use ./bin/start.sh       ${NC}"
