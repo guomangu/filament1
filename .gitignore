@@ -1,11 +1,10 @@
-# Ignore binaries
-/bin/mariadb
-/bin/frankenphp
-/bin/composer
+# Ignore portable binaries and generated wrappers
+/bin/*
+!/bin/start.sh
+!/bin/install.sh
 
-# Ignore data
-/data/mysql
-/data/storage
+# Ignore strictly all local testing data, databases, and logs
+/data/*
 
 # Ignore local config (optional, keep example)
 /src/.env

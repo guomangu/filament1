@@ -1,3 +1,0 @@
-#!/bin/bash
-cd "/home/guuu/Dev/filament1/src"
-exec "/home/guuu/Dev/filament1/bin/php" artisan "$@"
