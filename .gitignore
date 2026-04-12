@@ -1,7 +1,7 @@
-# Ignore portable binaries and generated wrappers
 /bin/*
 !/bin/start.sh
 !/bin/install.sh
+!/bin/mcp/
 
 # Ignore strictly all local testing data, databases, and logs
 /data/*
