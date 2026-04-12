@@ -5,11 +5,10 @@
 # ==============================================================================
 set -e
 
-if [ "$(id -u)" = "0" ]; then
-    echo -e "\033[0;31mERREUR: Ne lancez PAS ce script avec 'sudo' !\033[0m"
-    echo -e "\033[1;33mCela corrompt les droits de votre base de données et de vos fichiers. Relancez-le simplement: ./bin/install.sh\033[0m"
-    echo -e "Si des paquets système doivent être installés, le script vous demandera votre mot de passe temporairement au moment opportun."
-    exit 1
+# Detect Real User if running via Sudo
+REAL_USER="$USER"
+if [ "$SUDO_USER" ]; then
+    REAL_USER="$SUDO_USER"
 fi
 
 # Configuration
@@ -58,7 +57,7 @@ if [ "$NEEDS_INSTALL" -eq 1 ]; then
 fi
 
 # Fix home directory permissions if strict (typical on some VPS)
-USER_HOME="/home/$(whoami)"
+USER_HOME="/home/$REAL_USER"
 if [ -d "$USER_HOME" ]; then
     CURRENT_PERMS=$(stat -c %a "$USER_HOME")
     if [ "$CURRENT_PERMS" != "755" ]; then
@@ -278,7 +277,7 @@ sed -i "s|^#\? *DB_SOCKET=.*|DB_SOCKET=$SOCK_PATH|" .env
 sed -i "s|^#\? *DB_HOST=.*|DB_HOST=localhost|" .env
 sed -i "s|^#\? *DB_PORT=.*|DB_PORT=|" .env
 sed -i "s|^#\? *DB_DATABASE=.*|DB_DATABASE=laravel|" .env
-sed -i "s|^#\? *DB_USERNAME=.*|DB_USERNAME=$(whoami)|" .env
+sed -i "s|^#\? *DB_USERNAME=.*|DB_USERNAME=$REAL_USER|" .env
 sed -i "s|^#\? *DB_PASSWORD=.*|DB_PASSWORD=|" .env
 
 # Add only core binaries to PATH during install to avoid artisan wrapper conflicts
@@ -330,7 +329,7 @@ sleep 2
 
 if [ -z "$(ls -A "$MYSQL_DATA")" ]; then
     echo "Installing default system tables..."
-    "$MARIADB_DIR/scripts/mariadb-install-db" --user=$(whoami) --datadir="$MYSQL_DATA" --basedir="$MARIADB_DIR" --auth-root-authentication-method=normal
+    "$MARIADB_DIR/scripts/mariadb-install-db" --user=$REAL_USER --datadir="$MYSQL_DATA" --basedir="$MARIADB_DIR" --auth-root-authentication-method=normal
 fi
 
 # 5. Start temporary MariaDB for seeding & user setup
@@ -360,8 +359,8 @@ echo "Ensuring MariaDB accounts and 'laravel' database are configured..."
 "$MARIADB_DIR/bin/mariadb" --socket="$MYSQL_SOCKET" -u root -e "
     CREATE DATABASE IF NOT EXISTS laravel;
     FLUSH PRIVILEGES;
-    CREATE USER IF NOT EXISTS '$(whoami)'@'localhost' IDENTIFIED VIA unix_socket;
-    GRANT ALL PRIVILEGES ON *.* TO '$(whoami)'@'localhost' WITH GRANT OPTION;
+    CREATE USER IF NOT EXISTS '$REAL_USER'@'localhost' IDENTIFIED VIA unix_socket;
+    GRANT ALL PRIVILEGES ON *.* TO '$REAL_USER'@'localhost' WITH GRANT OPTION;
     ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket;
     FLUSH PRIVILEGES;
 " || {
@@ -390,18 +389,15 @@ wait $TEMP_PID 2>/dev/null || true
 # 5. Final Permissions
 echo -e "${YELLOW}[6/6] Finalizing permissions...${NC}"
 
-# Ensure current user owns everything (in case root start messed it up)
-CURRENT_USER=$(whoami)
-echo "Ensuring $CURRENT_USER owns storage and bootstrap/cache..."
+# Ensure the real user owns absolutely everything in the project
+echo "Ensuring $REAL_USER owns all project files..."
 
-# Try simple chown first, if fails, use sudo
-# Note: storage and bootstrap are in src/ (PWD), but data is in $DATA_DIR (absolute)
-if ! chown -R "$CURRENT_USER":"$CURRENT_USER" storage bootstrap/cache "$DATA_DIR" 2>/dev/null; then
-    echo -e "${YELLOW}Detected root-owned files. Fixing ownership with sudo...${NC}"
-    sudo chown -R "$CURRENT_USER":"$CURRENT_USER" storage bootstrap/cache "$DATA_DIR"
+if ! chown -R "$REAL_USER":"$REAL_USER" "$PROJECT_ROOT" 2>/dev/null; then
+    echo -e "${YELLOW}Detected root-owned files. Fixing project ownership with sudo...${NC}"
+    sudo chown -R "$REAL_USER":"$REAL_USER" "$PROJECT_ROOT"
 fi
 
-chmod -R 775 storage bootstrap/cache "$DATA_DIR"
+chmod -R 775 "$SRC_DIR/storage" "$SRC_DIR/bootstrap/cache" "$DATA_DIR"
 # Use frankenphp directly to avoid any wrapper issues with argument passing
 "$BIN_DIR/frankenphp" php-cli "$SRC_DIR/artisan" config:clear
 "$BIN_DIR/frankenphp" php-cli "$SRC_DIR/artisan" storage:link --force
