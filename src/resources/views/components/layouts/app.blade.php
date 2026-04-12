@@ -5,8 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         @php
-            $pageTitle = $title ?? 'TrustCircle | Réseau de Confiance & Projets de Proximité';
-            $metaDesc = $description ?? "Découvrez TrustCircle, le réseau social de confiance pour collaborer sur des projets locaux, valider des compétences et bâtir des cercles d'expertises vérifiés.";
+            $pageTitle = $title ?? 'guuu.fr | Réseau de Confiance & Projets de Proximité';
+            $metaDesc = $description ?? "Découvrez guuu.fr, le réseau social de confiance pour collaborer sur des projets locaux, valider des compétences et bâtir des cercles d'expertises vérifiés.";
             $metaKeywords = $keywords ?? "réseau de confiance, projets locaux, entraide, expertises, cercles de confiance, collaboration, proximité";
             $ogImage = $og_image ?? asset('images/og-default.jpg');
             $ogType = $og_type ?? 'website';
@@ -20,7 +20,7 @@
         {
           "@context": "https://schema.org",
           "@type": "WebSite",
-          "name": "TrustCircle",
+          "name": "guuu.fr",
           "url": "{{ url('/') }}",
           "potentialAction": {
             "@type": "SearchAction",

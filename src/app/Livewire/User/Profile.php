@@ -488,7 +488,7 @@ class Profile extends Component
             'activeProject' => $this->user->activeProject(),
             'allAchievements' => $allAchievements,
         ])->layoutData([
-            'title' => $this->user->name . ' | Expertises & Confiance (' . $this->user->trust_score . '%) | TrustCircle',
+            'title' => $this->user->name . ' | Expertises & Confiance (' . $this->user->trust_score . '%) | guuu.fr',
             'description' => \Illuminate\Support\Str::limit('Consultez le profil de ' . $this->user->name . ' : ' . $allAchievements->count() . ' compétences validées par la communauté. Score de confiance : ' . $this->user->trust_score . '%. Expertises principales : ' . $allAchievements->pluck('skill.name')->unique()->take(5)->implode(', '), 160, '...'),
             'og_image' => $this->user->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($this->user->name),
             'breadcrumbUser' => $this->user,

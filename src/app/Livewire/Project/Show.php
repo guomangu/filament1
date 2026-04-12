@@ -620,7 +620,7 @@ class Show extends Component
         $location = $this->project->city ? ' à ' . $this->project->city : '';
 
         return view('livewire.project.show')->layoutData([
-            'title' => 'Projet : ' . $this->project->title . $location . $offersText . ' | TrustCircle',
+            'title' => 'Projet : ' . $this->project->title . $location . $offersText . ' | guuu.fr',
             'description' => \Illuminate\Support\Str::limit('Découvrez le projet "' . $this->project->title . '"' . $location . '. ' . ($offerCount > 0 ? 'Consultez nos ' . $offerCount . ' offres de services. ' : '') . strip_tags($this->project->description), 160, '...'),
             'og_image' => $this->project->owner->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($this->project->owner->name),
             'breadcrumbProject' => $this->project,

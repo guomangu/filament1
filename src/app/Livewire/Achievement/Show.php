@@ -34,7 +34,7 @@ class Show extends Component
     public function render()
     {
         return view('livewire.achievement.show')->layoutData([
-            'title' => 'Preuve : ' . $this->achievement->title . ' | TrustCircle',
+            'title' => 'Preuve : ' . $this->achievement->title . ' | guuu.fr',
             'description' => \Illuminate\Support\Str::limit($this->achievement->description, 160),
             'breadcrumbAchievement' => $this->achievement,
         ]);

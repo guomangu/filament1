@@ -177,7 +177,7 @@ class Show extends Component
             'finishedRealisations' => $finishedRealisations,
             'topExpert' => $topExpert,
         ])->layoutData([
-            'title' => 'Mission : ' . $this->skill->name . ' | TrustCircle',
+            'title' => 'Mission : ' . $this->skill->name . ' | guuu.fr',
             'breadcrumbSkill' => $this->skill,
         ]);
     }

@@ -156,14 +156,14 @@ class Home extends Component
             return $entity;
         });
 
-        $dynamicTitle = 'TrustCircle | Réseau de Confiance & Projets de Proximité';
-        $dynamicDesc = 'Trouvez des experts vérifiés et soutenez des initiatives locales. TrustCircle connecte les talents via des cercles de confiance pour une collaboration transparente.';
+        $dynamicTitle = 'guuu.fr | Réseau de Confiance & Projets de Proximité';
+        $dynamicDesc = 'Trouvez des experts vérifiés et soutenez des initiatives locales. guuu.fr connecte les talents via des cercles de confiance pour une collaboration transparente.';
 
         if ($this->search) {
-            $dynamicTitle = '🔍 ' . ucfirst($this->search) . ' : Experts et Offres de Confiance | TrustCircle';
-            $dynamicDesc = 'Recherche en cours pour "' . $this->search . '". Découvrez les meilleurs talents et opportunités locales correspondant à votre besoin sur TrustCircle.';
+            $dynamicTitle = '🔍 ' . ucfirst($this->search) . ' : Experts et Offres de Confiance | guuu.fr';
+            $dynamicDesc = 'Recherche en cours pour "' . $this->search . '". Découvrez les meilleurs talents et opportunités locales correspondant à votre besoin sur guuu.fr.';
         } elseif ($this->locationName) {
-            $dynamicTitle = '📍 À Proximité de ' . $this->locationName . ' | Initiatives & Talents | TrustCircle';
+            $dynamicTitle = '📍 À Proximité de ' . $this->locationName . ' | Initiatives & Talents | guuu.fr';
             $dynamicDesc = 'Explorez les cercles de confiance et offres de services à ' . $this->locationName . '. Connectez-vous avec votre communauté locale pour bâtir demain.';
         }
 

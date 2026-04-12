@@ -71,7 +71,7 @@
                         @if($type === 'user')
                             <div class="flex items-center gap-2">
                                 <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                Membre Vérifié TrustCircle
+                                Membre Vérifié guuu.fr
                             </div>
                             <div class="flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
@@ -90,7 +90,7 @@
                 </div>
             </div>
 
-            <div class="text-right">
+            <div class="text-right shrink-0">
                 @php
                     $url = match($type) {
                         'user' => route('users.show', $user),
@@ -246,6 +246,24 @@
 
                                     <p class="text-xs text-slate-600 leading-relaxed font-medium mb-4">{{ $model->description }}</p>
                                     
+                                    @if($model->informations && $model->informations->count() > 0)
+                                        <div class="flex flex-wrap gap-2 mb-4">
+                                            @foreach($model->informations as $info)
+                                                <div class="flex items-center gap-2 bg-slate-50 border border-slate-100 px-2 py-1.5 rounded-lg max-w-full">
+                                                    @if(preg_match('/https?:\/\/[^\s]+/', $info->label))
+                                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data={{ urlencode($info->label) }}" class="w-8 h-8 bg-white border border-slate-200 rounded shrink-0 p-0.5">
+                                                    @else
+                                                        <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                    @endif
+                                                    <div class="min-w-0">
+                                                        <div class="text-[7px] font-black tracking-widest uppercase text-slate-400 leading-none mb-0.5">{{ $info->title }}</div>
+                                                        <div class="text-[9px] font-bold text-slate-700 leading-tight truncate">{{ $info->label }}</div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                    
                                     @if($type === 'achievement')
                                         <!-- Validations with comments -->
                                         <div class="grid grid-cols-2 gap-3">
@@ -340,7 +358,7 @@
 
         <!-- Footer -->
         <footer class="p-10 border-t border-slate-100 flex justify-between items-center text-[8px] font-black text-slate-300 uppercase tracking-[0.5em]">
-            <div>© TrustCircle • Preuve de Confiance Numérique</div>
+            <div>© guuu.fr • Preuve de Confiance Numérique</div>
             <div class="flex gap-8">
                 <span>Généré {{ now()->format('d/m/Y H:i') }}</span>
                 <span>Copie Certifiée</span>
