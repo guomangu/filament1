@@ -65,6 +65,37 @@ for i in {1..30}; do
     sleep 1
 done
 
+# Self-heal MariaDB User if they are missing (usually because DB was created as root)
+CURRENT_USER=$(whoami)
+export LD_LIBRARY_PATH="$BIN_DIR/lib:$LD_LIBRARY_PATH"
+if ! "$MARIADB_DIR/bin/mariadb" --socket="$MYSQL_SOCKET" -u "$CURRENT_USER" -e "SELECT 1;" >/dev/null 2>&1; then
+    echo -e "${YELLOW}Database user $CURRENT_USER not found or rejected. Auto-healing database permissions...${NC}"
+    kill $MARIADB_PID
+    wait $MARIADB_PID 2>/dev/null || true
+    
+    # Restart safely with skip-grant-tables
+    "$MARIADB_DIR/bin/mariadbd" --no-defaults --datadir="$MYSQL_DATA" --socket="$MYSQL_SOCKET" --pid-file="$MYSQL_PID" --skip-networking --skip-grant-tables --default-storage-engine=InnoDB $DB_USER_FLAG > /dev/null 2>&1 &
+    TEMP_PID=$!
+    
+    while [ ! -S "$MYSQL_SOCKET" ]; do sleep 1; done
+    
+    "$MARIADB_DIR/bin/mariadb" --socket="$MYSQL_SOCKET" -u root -e "
+        FLUSH PRIVILEGES;
+        CREATE USER IF NOT EXISTS '$CURRENT_USER'@'localhost' IDENTIFIED VIA unix_socket;
+        GRANT ALL PRIVILEGES ON *.* TO '$CURRENT_USER'@'localhost' WITH GRANT OPTION;
+        CREATE DATABASE IF NOT EXISTS laravel;
+        FLUSH PRIVILEGES;
+    "
+    
+    kill $TEMP_PID
+    wait $TEMP_PID 2>/dev/null || true
+    
+    # Restart normally
+    "$MARIADB_DIR/bin/mariadbd" --no-defaults --datadir="$MYSQL_DATA" --socket="$MYSQL_SOCKET" --pid-file="$MYSQL_PID" --skip-networking --default-storage-engine=InnoDB $DB_USER_FLAG >> "$LOG_DIR/mariadb.log" 2>&1 &
+    MARIADB_PID=$!
+    while [ ! -S "$MYSQL_SOCKET" ]; do sleep 1; done
+fi
+
 # Ensure DB_HOST is localhost for socket connection (prevent TCP fallback)
 cd "$SRC_DIR"
 if ! grep -q "^DB_HOST=localhost" .env; then
@@ -130,7 +161,7 @@ fi
 
 cd "$SRC_DIR"
 # Use setcap or sudo for port 80 if necessary, but here we just try
-"$BIN_DIR/frankenphp" php-server --domain guuu.localhost --root "$SRC_DIR/public" >> "$LOG_DIR/frankenphp.log" 2>&1 &
+"$BIN_DIR/frankenphp" php-server --domain guuu.fr --root "$SRC_DIR/public" >> "$LOG_DIR/frankenphp.log" 2>&1 &
 FRANKEN_PID=$!
 
 # Trap for clean shutdown
