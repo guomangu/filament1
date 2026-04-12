@@ -4,9 +4,25 @@
         
         @media print {
             .no-print { display: none !important; }
-            html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
+            html, body { 
+                background: white !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                min-width: 210mm !important; /* Force Android to use Desktop proportions */
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important;
+            }
             @page { size: A4; margin: 10mm; }
-            .cv-container { box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; max-width: none !important; }
+            .cv-container { 
+                box-shadow: none !important; 
+                border: none !important; 
+                margin: 0 !important; 
+                width: 210mm !important; 
+                min-width: 210mm !important; 
+                max-width: none !important; 
+            }
+            /* Prevent printing engine from slicing images and crucial sections in half */
+            section, img, h2, h3, h4 { break-inside: avoid; page-break-inside: avoid; }
         }
 
         .cv-container {
@@ -107,7 +123,7 @@
         <!-- Body -->
         <div class="flex-grow flex">
             <!-- Sidebar -->
-            <aside class="w-72 border-r border-slate-50 bg-slate-50/30 p-8 space-y-8">
+            <aside class="w-72 shrink-0 border-r border-slate-50 bg-slate-50/30 p-8 space-y-8">
                 <!-- Bio/Desc -->
                 <section>
                     <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">À Propos</h3>
