@@ -121,9 +121,9 @@
         </header>
 
         <!-- Body -->
-        <div class="flex-grow flex">
+        <div class="flex-grow grid grid-cols-[18rem_minmax(0,1fr)]">
             <!-- Sidebar -->
-            <aside class="w-72 shrink-0 border-r border-slate-50 bg-slate-50/30 p-8 space-y-8">
+            <aside class="border-r border-slate-50 bg-slate-50/30 p-8 space-y-8">
                 <!-- Bio/Desc -->
                 <section>
                     <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">À Propos</h3>
@@ -202,7 +202,7 @@
             </aside>
 
             <!-- Main Panel -->
-            <main class="flex-grow p-10 space-y-10">
+            <main class="p-10 space-y-10">
                 @if($type === 'user')
                     <!-- User Realisations (Achievements + Projects) -->
                     <section>
